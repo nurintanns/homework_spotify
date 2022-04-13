@@ -1,105 +1,106 @@
-import '../../Assets/Styles/App.css';
-import Music from '../../Components/Music';
-import SearchBar from '../../Components/SearchBar';
-import React, { useState } from 'react';
-import PlaylistForm from '../../Components/FormPlaylist';
-import { useSelector } from 'react-redux';
+import "../../Assets/Styles/App.css";
+import "../../Assets/Styles/CreatePlaylist.css";
+import Music from "../../Components/Music";
+import SearchBar from "../../Components/SearchBar";
+import React, { useState } from "react";
+import PlaylistForm from "../../Components/FormPlaylist";
+import { useSelector } from "react-redux";
 import {
-  Redirect
+	Redirect
 } from "react-router-dom";
 
 function CreatePlaylist() {
 
-  const [searchKey, setSearchKey] = useState("");
-  const [musicData, setMusicData] = useState([]);
-  const [selectedMusic, setSelectedMusic] = useState([]);
-  const { token } = useSelector((state) => state.userToken);
+	const [searchKey, setSearchKey] = useState("");
+	const [musicData, setMusicData] = useState([]);
+	const [selectedMusic, setSelectedMusic] = useState([]);
+	const { token } = useSelector((state) => state.userToken);
 
-  const handleInput = (e) => {
-    setSearchKey(e.target.value);
-  };
+	const handleInput = (e) => {
+		setSearchKey(e.target.value);
+	};
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    const url = "https://api.spotify.com/v1/search";
-    const keywords = searchKey;
-    const type = "track";
-    console.log(token);
-    try {
-      const response = await fetch(`${url}?q=${keywords}&type=${type}&limit=10`, {
-        headers: {
-          'Authorization' : 'Bearer ' + token
-        }
-      });
-      
-      if (!response.ok) {
-        switch (response.status) {
-          case 401:
-            throw new Error(`Unauthorized access, please login first`);
-          case 403:
-            throw new Error(`Forbidden access`);
-          default:
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-      } else {
-        const musicData = await response.json()
-        setMusicData(musicData.tracks.items);
-      }
-    } catch (error) {
-      alert(`There has been a problem with your fetch operation: ${error.message}`);
-    }
-  };
+	const handleSearch = async (e) => {
+		e.preventDefault();
+		const url = "https://api.spotify.com/v1/search";
+		const keywords = searchKey;
+		const type = "track";
+		console.log(token);
+		try {
+			const response = await fetch(`${url}?q=${keywords}&type=${type}&limit=12`, {
+				headers: {
+					"Authorization" : "Bearer " + token
+				}
+			});
 
-  
-  const selectMusic = (data) => {
-    const tempArrMusicId = [...selectedMusic, data.uri];
-    setSelectedMusic(tempArrMusicId);
-  };
+			if (!response.ok) {
+				switch (response.status) {
+				case 401:
+					throw new Error("Unauthorized access, please login first");
+				case 403:
+					throw new Error("Forbidden access");
+				default:
+					throw new Error(`HTTP error! status: ${response.status}`);
+				}
+			} else {
+				const musicData = await response.json();
+				setMusicData(musicData.tracks.items);
+			}
+		} catch (error) {
+			alert(`There has been a problem with your fetch operation: ${error.message}`);
+		}
+	};
 
-  const deselectMusic = (data) => {
-    const index = selectedMusic.indexOf(data.uri);
+	const selectMusic = (data) => {
+		const tempArrMusicId = [...selectedMusic, data.uri];
+		setSelectedMusic(tempArrMusicId);
+	};
 
-    const tempArrMusicId = selectedMusic.concat([]);
-    tempArrMusicId.splice(index, 1);
-    setSelectedMusic(tempArrMusicId);
-  };
+	const deselectMusic = (data) => {
+		const index = selectedMusic.indexOf(data.uri);
 
-  return (
-    <div className="App">
-      {
-          token === "" ? <Redirect to="/"/> : <p>You're Logged in</p> 
-      }
-      <h1>Create your own playlist</h1>
+		const tempArrMusicId = selectedMusic.concat([]);
+		tempArrMusicId.splice(index, 1);
+		setSelectedMusic(tempArrMusicId);
+	};
 
-      <PlaylistForm selectedMusic={selectedMusic} />
+	return (
+		<div className="App">
+			{
+				token === "" ? <Redirect to="/"/> : <p>You&apos;re Logged in</p> 
+			}
+			<h1>Create your own playlist</h1>
 
-      <h3>Search and select your tracks first, before saving the playlist.</h3>
+			<PlaylistForm selectedMusic={selectedMusic} />
 
-      <SearchBar handleInput={handleInput} handleSearch={handleSearch}/>
+			<h3>Search and select your tracks first, before saving the playlist.</h3>
 
-      <div className='musics-wrapper'>
-        {
-          musicData
-          .filter((music) => {
-            return selectedMusic.includes(music.uri);
-          })
-          .map((music) => {
-            return <Music key={music.uri} data={music} select={selectMusic} deselect={deselectMusic} isSelected={true}/>
-          })
-        }
-        {
-          musicData
-          .filter((music) => {
-            return !selectedMusic.includes(music.uri);
-          })
-          .map((music) => {
-            return <Music key={music.uri} data={music} select={selectMusic} deselect={deselectMusic} isSelected={false}/>
-          })
-        }
+			<SearchBar handleInput={handleInput} handleSearch={handleSearch}/>
 
-      </div>
-    </div>
-  );
+			<div className='musics-wrapper'>
+
+				{
+					musicData
+						.filter((music) => {
+							return selectedMusic.includes(music.uri);
+						})
+						.map((music) => {
+							return <Music key={music.uri} data={music} select={selectMusic} deselect={deselectMusic} isSelected={true}/>;
+						})
+				}
+				{
+					musicData
+						.filter((music) => {
+							return !selectedMusic.includes(music.uri);
+						})
+						.map((music) => {
+							return <Music key={music.uri} data={music} select={selectMusic} deselect={deselectMusic} isSelected={false}/>;
+						})
+				}
+
+			</div>
+		</div>
+	);
 }
 
 export default CreatePlaylist;
