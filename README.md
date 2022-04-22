@@ -12,7 +12,7 @@ Fitur yang tersedia adalah
 6. menuliskan judul dan deskripsi playlistmu
 7. terdapat notifikasi playlistmu jika sudah berhasil dibuat
 
-##Cara Install
+## Cara Install
 Bisa di download terlebih dahulu file zip dari project ini dan menjalankannya menggunakan npm start
 atau 
 bisa akses https://homework-spotify-red.vercel.app/
